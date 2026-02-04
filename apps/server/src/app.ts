@@ -1,9 +1,9 @@
-import express from 'express';
+import express, { type Express } from 'express';
 import './firebase'; // Initialize Firebase Admin
 import { authMiddleware } from './middleware/auth';
 import achievementsRouter from './routes/achievements';
 
-const app = express();
+const app: Express = express();
 
 app.use(express.json());
 

@@ -18,3 +18,12 @@ export const AchievementSchema = z.object({
   achievements: z.array(AchievementItemSchema),
 });
 export type Achievement = z.infer<typeof AchievementSchema>;
+
+export const CreateAchievementSchema = AchievementSchema.omit({
+  id: true,
+  createdAt: true,
+});
+export type CreateAchievement = z.infer<typeof CreateAchievementSchema>;
+
+export const UpdateAchievementSchema = CreateAchievementSchema.partial();
+export type UpdateAchievement = z.infer<typeof UpdateAchievementSchema>;

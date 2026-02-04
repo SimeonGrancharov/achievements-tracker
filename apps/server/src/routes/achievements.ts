@@ -1,6 +1,12 @@
-import { Router, type Router as RouterType } from 'express';
+import { Router, type Router as RouterType, type Request } from 'express';
 import { authMiddleware } from '../middleware/auth';
+import { validate } from '../middleware/validate';
 import * as achievementsService from '../services/achievements';
+import {
+  CreateAchievementSchema,
+  UpdateAchievementSchema,
+  AchievementItemSchema,
+} from '@achievements-tracker/shared';
 
 const router: RouterType = Router();
 
@@ -20,16 +26,12 @@ router.get('/:id', async (req, res) => {
   res.json(achievement);
 });
 
-router.post('/', async (req, res) => {
-  try {
-    const achievement = await achievementsService.createAchievement(req.body);
-    res.status(201).json(achievement);
-  } catch (error) {
-    res.status(400).json({ error: 'Invalid data' });
-  }
+router.post('/', validate(CreateAchievementSchema), async (req, res) => {
+  const achievement = await achievementsService.createAchievement(req.body);
+  res.status(201).json(achievement);
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', validate(UpdateAchievementSchema), async (req: Request<{ id: string }>, res) => {
   const achievement = await achievementsService.updateAchievement(req.params.id, req.body);
   if (!achievement) {
     res.status(404).json({ error: 'Achievement not found' });
@@ -47,17 +49,13 @@ router.delete('/:id', async (req, res) => {
   res.status(204).send();
 });
 
-router.post('/:id/items', async (req, res) => {
-  try {
-    const achievement = await achievementsService.addAchievementItem(req.params.id, req.body);
-    if (!achievement) {
-      res.status(404).json({ error: 'Achievement not found' });
-      return;
-    }
-    res.status(201).json(achievement);
-  } catch (error) {
-    res.status(400).json({ error: 'Invalid data' });
+router.post('/:id/items', validate(AchievementItemSchema), async (req: Request<{ id: string }>, res) => {
+  const achievement = await achievementsService.addAchievementItem(req.params.id, req.body);
+  if (!achievement) {
+    res.status(404).json({ error: 'Achievement not found' });
+    return;
   }
+  res.status(201).json(achievement);
 });
 
 export default router;
