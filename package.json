@@ -1,0 +1,12 @@
+{
+  "name": "achievements-tracker",
+  "private": true,
+  "scripts": {
+    "dev:server": "pnpm --filter server dev",
+    "build:server": "pnpm --filter server build",
+    "start:server": "pnpm --filter server start"
+  },
+  "devDependencies": {
+    "typescript": "5.7.3"
+  }
+}
