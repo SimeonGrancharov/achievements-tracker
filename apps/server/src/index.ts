@@ -1,6 +1,7 @@
 import express from 'express';
 import './firebase'; // Initialize Firebase Admin
 import { authMiddleware } from './middleware/auth';
+import achievementsRouter from './routes/achievements';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -19,6 +20,8 @@ app.get('/api/me', authMiddleware, (req, res) => {
     name: req.user!.name,
   });
 });
+
+app.use('/api/achievements', achievementsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
