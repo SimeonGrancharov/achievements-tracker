@@ -1,6 +1,7 @@
 import Expo
 import React
 import ReactAppDependencyProvider
+import Firebase
 
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
@@ -20,7 +21,7 @@ public class AppDelegate: ExpoAppDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
     bindReactNativeFactory(factory)
-
+    FirebaseApp.configure()
 #if os(iOS) || os(tvOS)
     window = UIWindow(frame: UIScreen.main.bounds)
     factory.startReactNative(

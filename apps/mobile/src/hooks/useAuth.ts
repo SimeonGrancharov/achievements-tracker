@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
-import auth from '@react-native-firebase/auth';
-import { useAppDispatch } from '../store/hooks';
-import { setUser, setToken } from '../store/authSlice';
+import { useEffect } from "react";
+import { getAuth } from "@react-native-firebase/auth";
+import { useAppDispatch } from "../store/hooks";
+import { setUser, setToken } from "../store/authSlice";
+import firebase from "@react-native-firebase/app";
 
 export function useAuthStateListener() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async (firebaseUser) => {
+    const unsubscribe = getAuth().onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         const token = await firebaseUser.getIdToken();
+
         dispatch(
           setUser({
             user: {
@@ -18,7 +20,7 @@ export function useAuthStateListener() {
               displayName: firebaseUser.displayName,
             },
             token,
-          })
+          }),
         );
       } else {
         dispatch(setUser(null));
@@ -30,21 +32,23 @@ export function useAuthStateListener() {
 }
 
 export async function signIn(email: string, password: string) {
-  return auth().signInWithEmailAndPassword(email, password);
+  return getAuth().signInWithEmailAndPassword(email, password);
 }
 
 export async function signUp(email: string, password: string) {
-  return auth().createUserWithEmailAndPassword(email, password);
+  return getAuth().createUserWithEmailAndPassword(email, password);
 }
 
 export async function signOut() {
-  return auth().signOut();
+  return getAuth().signOut();
 }
 
 export async function refreshToken() {
-  const user = auth().currentUser;
+  const user = getAuth().currentUser;
+
   if (user) {
     return user.getIdToken(true);
   }
+
   return null;
 }
