@@ -13,6 +13,7 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Achievement } from '@achievements-tracker/shared';
 import { useCreateAchievementGroupMutation } from '../store/api';
+import { Swipeable } from '../components/Swipeable';
 import type { RootStackParamList } from '../navigation/types';
 
 const SIZES = ['S', 'M', 'L'] as const;
@@ -160,13 +161,13 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
         </View>
 
         {items.map((item, index) => (
-          <View key={index} style={styles.itemCard}>
-            <View style={styles.itemCardHeader}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <TouchableOpacity onPress={() => handleRemoveItem(index)}>
-                <Text style={styles.removeText}>Remove</Text>
-              </TouchableOpacity>
-            </View>
+          <Swipeable
+            key={index}
+            view="tile"
+            role="delete"
+            onDelete={() => handleRemoveItem(index)}
+          >
+            <Text style={styles.itemName}>{item.name}</Text>
             {item.description ? (
               <Text style={styles.itemDescription}>{item.description}</Text>
             ) : null}
@@ -174,7 +175,7 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
               <Text style={styles.tag}>{item.size}</Text>
               <Text style={styles.tag}>{item.type}</Text>
             </View>
-          </View>
+          </Swipeable>
         ))}
 
         {showItemForm && (
@@ -239,27 +240,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  itemCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  itemCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   itemName: {
     fontSize: 15,
     fontWeight: '600',
-    flex: 1,
-  },
-  removeText: {
-    color: '#ff3b30',
-    fontSize: 13,
   },
   itemDescription: {
     fontSize: 13,

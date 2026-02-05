@@ -1,68 +1,20 @@
-import { useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Animated, Alert } from 'react-native';
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AchievementGroup } from '@achievements-tracker/shared';
 import { useAppSelector } from '../store/hooks';
 import { useGetAchievementGroupsQuery, useDeleteAchievementGroupMutation } from '../store/api';
 import { signOut } from '../hooks/useAuth';
+import { Swipeable } from '../components/Swipeable';
 import type { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
-
-function SwipeableCard({
-  item,
-  onPress,
-  onDelete,
-}: {
-  item: AchievementGroup;
-  onPress: () => void;
-  onDelete: () => void;
-}) {
-  const swipeableRef = useRef<Swipeable>(null);
-
-  const renderRightActions = (
-    _progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>,
-  ) => {
-    const scale = dragX.interpolate({
-      inputRange: [-80, 0],
-      outputRange: [1, 0.5],
-      extrapolate: 'clamp',
-    });
-
-    return (
-      <TouchableOpacity
-        style={styles.deleteAction}
-        onPress={() => {
-          swipeableRef.current?.close();
-          onDelete();
-        }}
-      >
-        <Animated.Text style={[styles.deleteText, { transform: [{ scale }] }]}>
-          Delete
-        </Animated.Text>
-      </TouchableOpacity>
-    );
-  };
-
-  return (
-    <Swipeable ref={swipeableRef} renderRightActions={renderRightActions} overshootRight={false}>
-      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
-        <Text style={styles.cardDescription}>{item.description}</Text>
-        <Text style={styles.cardCount}>
-          {item.achievements.length} achievement(s)
-        </Text>
-      </TouchableOpacity>
-    </Swipeable>
-  );
-}
 
 export function HomeScreen({ navigation }: Props) {
   const user = useAppSelector((state) => state.auth.user);
   const { data: groups, isLoading, error } = useGetAchievementGroupsQuery();
   const [deleteGroup] = useDeleteAchievementGroupMutation();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = (item: AchievementGroup) => {
     Alert.alert('Delete', `Delete "${item.name}"?`, [
@@ -71,10 +23,13 @@ export function HomeScreen({ navigation }: Props) {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
+          setDeletingId(item.id);
           try {
             await deleteGroup(item.id).unwrap();
           } catch {
             Alert.alert('Error', 'Failed to delete achievement group');
+          } finally {
+            setDeletingId(null);
           }
         },
       },
@@ -82,7 +37,7 @@ export function HomeScreen({ navigation }: Props) {
   };
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome, {user?.email}</Text>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
@@ -98,11 +53,19 @@ export function HomeScreen({ navigation }: Props) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <SwipeableCard
-            item={item}
+          <Swipeable
+            view="card"
+            role="delete"
             onPress={() => navigation.navigate('ViewAchievementGroup', { id: item.id })}
             onDelete={() => handleDelete(item)}
-          />
+            isDeleting={deletingId === item.id}
+          >
+            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardDescription}>{item.description}</Text>
+            <Text style={styles.cardCount}>
+              {item.achievements.length} achievement(s)
+            </Text>
+          </Swipeable>
         )}
         ListEmptyComponent={
           !isLoading ? (
@@ -118,7 +81,7 @@ export function HomeScreen({ navigation }: Props) {
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
@@ -150,17 +113,6 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -174,19 +126,6 @@ const styles = StyleSheet.create({
   cardCount: {
     fontSize: 12,
     color: '#999',
-  },
-  deleteAction: {
-    backgroundColor: '#ff3b30',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 80,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  deleteText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
   },
   message: {
     textAlign: 'center',

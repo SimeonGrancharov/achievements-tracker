@@ -1,4 +1,5 @@
 import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAppSelector } from "../store/hooks";
@@ -32,6 +33,7 @@ export function AuthGate() {
   }
 
   return (
+    <GestureHandlerRootView style={styles.flex}>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -62,10 +64,14 @@ export function AuthGate() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   loading: {
     flex: 1,
     justifyContent: "center",
