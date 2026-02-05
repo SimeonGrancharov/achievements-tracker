@@ -1,18 +1,88 @@
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Animated, Alert } from 'react-native';
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { AchievementGroup } from '@achievements-tracker/shared';
 import { useAppSelector } from '../store/hooks';
-import { useGetAchievementGroupsQuery } from '../store/api';
+import { useGetAchievementGroupsQuery, useDeleteAchievementGroupMutation } from '../store/api';
 import { signOut } from '../hooks/useAuth';
 import type { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
+function SwipeableCard({
+  item,
+  onPress,
+  onDelete,
+}: {
+  item: AchievementGroup;
+  onPress: () => void;
+  onDelete: () => void;
+}) {
+  const swipeableRef = useRef<Swipeable>(null);
+
+  const renderRightActions = (
+    _progress: Animated.AnimatedInterpolation<number>,
+    dragX: Animated.AnimatedInterpolation<number>,
+  ) => {
+    const scale = dragX.interpolate({
+      inputRange: [-80, 0],
+      outputRange: [1, 0.5],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <TouchableOpacity
+        style={styles.deleteAction}
+        onPress={() => {
+          swipeableRef.current?.close();
+          onDelete();
+        }}
+      >
+        <Animated.Text style={[styles.deleteText, { transform: [{ scale }] }]}>
+          Delete
+        </Animated.Text>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <Swipeable ref={swipeableRef} renderRightActions={renderRightActions} overshootRight={false}>
+      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardDescription}>{item.description}</Text>
+        <Text style={styles.cardCount}>
+          {item.achievements.length} achievement(s)
+        </Text>
+      </TouchableOpacity>
+    </Swipeable>
+  );
+}
+
 export function HomeScreen({ navigation }: Props) {
   const user = useAppSelector((state) => state.auth.user);
   const { data: groups, isLoading, error } = useGetAchievementGroupsQuery();
+  const [deleteGroup] = useDeleteAchievementGroupMutation();
+
+  const handleDelete = (item: AchievementGroup) => {
+    Alert.alert('Delete', `Delete "${item.name}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteGroup(item.id).unwrap();
+          } catch {
+            Alert.alert('Error', 'Failed to delete achievement group');
+          }
+        },
+      },
+    ]);
+  };
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome, {user?.email}</Text>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
@@ -28,13 +98,11 @@ export function HomeScreen({ navigation }: Props) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <Text style={styles.cardDescription}>{item.description}</Text>
-            <Text style={styles.cardCount}>
-              {item.achievements.length} achievement(s)
-            </Text>
-          </View>
+          <SwipeableCard
+            item={item}
+            onPress={() => navigation.navigate('ViewAchievementGroup', { id: item.id })}
+            onDelete={() => handleDelete(item)}
+          />
         )}
         ListEmptyComponent={
           !isLoading ? (
@@ -50,7 +118,7 @@ export function HomeScreen({ navigation }: Props) {
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -106,6 +174,19 @@ const styles = StyleSheet.create({
   cardCount: {
     fontSize: 12,
     color: '#999',
+  },
+  deleteAction: {
+    backgroundColor: '#ff3b30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  deleteText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
   message: {
     textAlign: 'center',

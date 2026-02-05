@@ -6,6 +6,8 @@ import { useAuthStateListener } from "../hooks/useAuth";
 import { LoginScreen } from "../screens/LoginScreen";
 import { HomeScreen } from "../screens/HomeScreen";
 import { CreateAchievementGroupScreen } from "../screens/CreateAchievementScreen";
+import { ViewAchievementGroupScreen } from "../screens/ViewAchievementGroupScreen";
+import { EditAchievementGroupScreen } from "../screens/EditAchievementGroupScreen";
 import type { RootStackParamList } from "../navigation/types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -42,6 +44,19 @@ export function AuthGate() {
           component={CreateAchievementGroupScreen}
           options={{
             title: "New Achievement Group",
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="ViewAchievementGroup"
+          component={ViewAchievementGroupScreen}
+          options={{ title: "Achievement Group" }}
+        />
+        <Stack.Screen
+          name="EditAchievementGroup"
+          component={EditAchievementGroupScreen}
+          options={{
+            title: "Edit Achievement Group",
             presentation: "modal",
           }}
         />
