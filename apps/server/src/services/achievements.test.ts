@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Achievement } from '@achievements-tracker/shared';
+import type { AchievementGroup } from '@achievements-tracker/shared';
 
 const mockDoc = {
   id: 'test-id',
@@ -42,7 +42,7 @@ describe('achievements service', () => {
   });
 
   describe('getAllAchievements', () => {
-    it('should return all achievements', async () => {
+    it('should return all achievement groups', async () => {
       mockCollection.get.mockResolvedValue({
         docs: [{ id: 'test-id', data: () => mockAchievementData }],
       });
@@ -56,7 +56,7 @@ describe('achievements service', () => {
       });
     });
 
-    it('should return empty array when no achievements', async () => {
+    it('should return empty array when no achievement groups', async () => {
       mockCollection.get.mockResolvedValue({ docs: [] });
 
       const result = await getAllAchievements();
@@ -66,7 +66,7 @@ describe('achievements service', () => {
   });
 
   describe('getAchievementById', () => {
-    it('should return achievement when found', async () => {
+    it('should return achievement group when found', async () => {
       const result = await getAchievementById('test-id');
 
       expect(result).toMatchObject({
@@ -85,7 +85,7 @@ describe('achievements service', () => {
   });
 
   describe('createAchievement', () => {
-    it('should create and return new achievement', async () => {
+    it('should create and return new achievement group', async () => {
       mockCollection.add.mockResolvedValue({ id: 'new-id' });
 
       const result = await createAchievement({
@@ -101,7 +101,7 @@ describe('achievements service', () => {
   });
 
   describe('updateAchievement', () => {
-    it('should update and return achievement', async () => {
+    it('should update and return achievement group', async () => {
       const updatedData = { ...mockAchievementData, name: 'Updated' };
       mockDoc.data.mockReturnValue(updatedData);
 

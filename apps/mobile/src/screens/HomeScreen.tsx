@@ -1,11 +1,15 @@
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAppSelector } from '../store/hooks';
-import { useGetAchievementsQuery } from '../store/api';
+import { useGetAchievementGroupsQuery } from '../store/api';
 import { signOut } from '../hooks/useAuth';
+import type { RootStackParamList } from '../navigation/types';
 
-export function HomeScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+export function HomeScreen({ navigation }: Props) {
   const user = useAppSelector((state) => state.auth.user);
-  const { data: achievements, isLoading, error } = useGetAchievementsQuery();
+  const { data: groups, isLoading, error } = useGetAchievementGroupsQuery();
 
   return (
     <View style={styles.container}>
@@ -20,7 +24,7 @@ export function HomeScreen() {
       {error && <Text style={styles.error}>Failed to load achievements</Text>}
 
       <FlatList
-        data={achievements}
+        data={groups}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
@@ -38,6 +42,14 @@ export function HomeScreen() {
           ) : null
         }
       />
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate('CreateAchievementGroup')}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -104,5 +116,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#ff3b30',
     marginTop: 32,
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 40,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+  fabText: {
+    color: '#fff',
+    fontSize: 28,
+    lineHeight: 30,
+    fontWeight: '300',
   },
 });

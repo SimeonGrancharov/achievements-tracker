@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { getAuth } from "@react-native-firebase/auth";
 import { useAppDispatch } from "../store/hooks";
-import { setUser, setToken } from "../store/authSlice";
-import firebase from "@react-native-firebase/app";
+import { setUser } from "../store/authSlice";
 
 export function useAuthStateListener() {
   const dispatch = useAppDispatch();

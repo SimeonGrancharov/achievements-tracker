@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from './index';
 import type {
+  AchievementGroup,
+  CreateAchievementGroup,
+  UpdateAchievementGroup,
   Achievement,
-  CreateAchievement,
-  UpdateAchievement,
-  AchievementItem,
 } from '@achievements-tracker/shared';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
@@ -21,61 +21,61 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Achievement'],
+  tagTypes: ['AchievementGroup'],
   endpoints: (builder) => ({
-    getAchievements: builder.query<Achievement[], void>({
+    getAchievementGroups: builder.query<AchievementGroup[], void>({
       query: () => '/api/achievements',
-      providesTags: ['Achievement'],
+      providesTags: ['AchievementGroup'],
     }),
-    getAchievement: builder.query<Achievement, string>({
+    getAchievementGroup: builder.query<AchievementGroup, string>({
       query: (id) => `/api/achievements/${id}`,
-      providesTags: (_result, _error, id) => [{ type: 'Achievement', id }],
+      providesTags: (_result, _error, id) => [{ type: 'AchievementGroup', id }],
     }),
-    createAchievement: builder.mutation<Achievement, CreateAchievement>({
+    createAchievementGroup: builder.mutation<AchievementGroup, CreateAchievementGroup>({
       query: (body) => ({
         url: '/api/achievements',
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Achievement'],
+      invalidatesTags: ['AchievementGroup'],
     }),
-    updateAchievement: builder.mutation<
-      Achievement,
-      { id: string; data: UpdateAchievement }
+    updateAchievementGroup: builder.mutation<
+      AchievementGroup,
+      { id: string; data: UpdateAchievementGroup }
     >({
       query: ({ id, data }) => ({
         url: `/api/achievements/${id}`,
         method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: 'Achievement', id }],
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'AchievementGroup', id }],
     }),
-    deleteAchievement: builder.mutation<void, string>({
+    deleteAchievementGroup: builder.mutation<void, string>({
       query: (id) => ({
         url: `/api/achievements/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Achievement'],
+      invalidatesTags: ['AchievementGroup'],
     }),
-    addAchievementItem: builder.mutation<
-      Achievement,
-      { id: string; item: AchievementItem }
+    addAchievement: builder.mutation<
+      AchievementGroup,
+      { id: string; item: Achievement }
     >({
       query: ({ id, item }) => ({
         url: `/api/achievements/${id}/items`,
         method: 'POST',
         body: item,
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: 'Achievement', id }],
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'AchievementGroup', id }],
     }),
   }),
 });
 
 export const {
-  useGetAchievementsQuery,
-  useGetAchievementQuery,
-  useCreateAchievementMutation,
-  useUpdateAchievementMutation,
-  useDeleteAchievementMutation,
-  useAddAchievementItemMutation,
+  useGetAchievementGroupsQuery,
+  useGetAchievementGroupQuery,
+  useCreateAchievementGroupMutation,
+  useUpdateAchievementGroupMutation,
+  useDeleteAchievementGroupMutation,
+  useAddAchievementMutation,
 } = api;

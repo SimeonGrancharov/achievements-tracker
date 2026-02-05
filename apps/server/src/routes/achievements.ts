@@ -3,9 +3,9 @@ import { authMiddleware } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import * as achievementsService from '../services/achievements';
 import {
-  CreateAchievementSchema,
-  UpdateAchievementSchema,
-  AchievementItemSchema,
+  CreateAchievementGroupSchema,
+  UpdateAchievementGroupSchema,
+  AchievementSchema,
 } from '@achievements-tracker/shared';
 
 const router: RouterType = Router();
@@ -26,12 +26,12 @@ router.get('/:id', async (req, res) => {
   res.json(achievement);
 });
 
-router.post('/', validate(CreateAchievementSchema), async (req, res) => {
+router.post('/', validate(CreateAchievementGroupSchema), async (req, res) => {
   const achievement = await achievementsService.createAchievement(req.body);
   res.status(201).json(achievement);
 });
 
-router.patch('/:id', validate(UpdateAchievementSchema), async (req: Request<{ id: string }>, res) => {
+router.patch('/:id', validate(UpdateAchievementGroupSchema), async (req: Request<{ id: string }>, res) => {
   const achievement = await achievementsService.updateAchievement(req.params.id, req.body);
   if (!achievement) {
     res.status(404).json({ error: 'Achievement not found' });
@@ -49,7 +49,7 @@ router.delete('/:id', async (req, res) => {
   res.status(204).send();
 });
 
-router.post('/:id/items', validate(AchievementItemSchema), async (req: Request<{ id: string }>, res) => {
+router.post('/:id/items', validate(AchievementSchema), async (req: Request<{ id: string }>, res) => {
   const achievement = await achievementsService.addAchievementItem(req.params.id, req.body);
   if (!achievement) {
     res.status(404).json({ error: 'Achievement not found' });

@@ -25,7 +25,7 @@ describe('achievements routes', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return achievements with valid token', async () => {
+    it('should return achievement groups with valid token', async () => {
       const res = await request(app)
         .get('/api/achievements')
         .set('Authorization', `Bearer ${token}`);
@@ -44,7 +44,7 @@ describe('achievements routes', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should create achievement with valid token', async () => {
+    it('should create achievement group with valid token', async () => {
       const res = await request(app)
         .post('/api/achievements')
         .set('Authorization', `Bearer ${token}`)
@@ -72,7 +72,7 @@ describe('achievements routes', () => {
       expect(res.status).toBe(404);
     });
 
-    it('should return achievement by id', async () => {
+    it('should return achievement group by id', async () => {
       const res = await request(app)
         .get(`/api/achievements/${createdId}`)
         .set('Authorization', `Bearer ${token}`);
@@ -83,7 +83,7 @@ describe('achievements routes', () => {
   });
 
   describe('PATCH /api/achievements/:id', () => {
-    it('should update achievement', async () => {
+    it('should update achievement group', async () => {
       const res = await request(app)
         .patch(`/api/achievements/${createdId}`)
         .set('Authorization', `Bearer ${token}`)
@@ -95,13 +95,13 @@ describe('achievements routes', () => {
   });
 
   describe('POST /api/achievements/:id/items', () => {
-    it('should add achievement item', async () => {
+    it('should add achievement to group', async () => {
       const res = await request(app)
         .post(`/api/achievements/${createdId}/items`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           name: 'Test Item',
-          description: 'A test achievement item',
+          description: 'A test achievement',
           size: 'M',
           type: 'Feature',
         });
@@ -113,7 +113,7 @@ describe('achievements routes', () => {
   });
 
   describe('DELETE /api/achievements/:id', () => {
-    it('should delete achievement', async () => {
+    it('should delete achievement group', async () => {
       const res = await request(app)
         .delete(`/api/achievements/${createdId}`)
         .set('Authorization', `Bearer ${token}`);

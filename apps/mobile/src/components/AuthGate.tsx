@@ -1,13 +1,21 @@
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { useAppSelector } from '../store/hooks';
-import { useAuthStateListener } from '../hooks/useAuth';
-import { LoginScreen } from '../screens/LoginScreen';
-import { HomeScreen } from '../screens/HomeScreen';
+import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useAppSelector } from "../store/hooks";
+import { useAuthStateListener } from "../hooks/useAuth";
+import { LoginScreen } from "../screens/LoginScreen";
+import { HomeScreen } from "../screens/HomeScreen";
+import { CreateAchievementGroupScreen } from "../screens/CreateAchievementScreen";
+import type { RootStackParamList } from "../navigation/types";
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AuthGate() {
   useAuthStateListener();
 
-  const { user, isLoading, isInitialized } = useAppSelector((state) => state.auth);
+  const { user, isLoading, isInitialized } = useAppSelector(
+    (state) => state.auth,
+  );
 
   if (!isInitialized || isLoading) {
     return (
@@ -17,13 +25,35 @@ export function AuthGate() {
     );
   }
 
-  return user ? <HomeScreen /> : <LoginScreen />;
+  if (!user) {
+    return <LoginScreen />;
+  }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CreateAchievementGroup"
+          component={CreateAchievementGroupScreen}
+          options={{
+            title: "New Achievement Group",
+            presentation: "modal",
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({
   loading: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

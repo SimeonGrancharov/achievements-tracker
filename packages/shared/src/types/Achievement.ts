@@ -2,28 +2,28 @@ import { z } from 'zod';
 import { AchievementSize } from './AchievementSize';
 import { AchievementType } from './AchievementType';
 
-export const AchievementItemSchema = z.object({
+export const AchievementSchema = z.object({
   name: z.string(),
   description: z.string(),
   size: AchievementSize,
   type: AchievementType,
 });
-export type AchievementItem = z.infer<typeof AchievementItemSchema>;
+export type Achievement = z.infer<typeof AchievementSchema>;
 
-export const AchievementSchema = z.object({
+export const AchievementGroupSchema = z.object({
   id: z.string(),
   name: z.string(),
   createdAt: z.number(),
   description: z.string(),
-  achievements: z.array(AchievementItemSchema),
+  achievements: z.array(AchievementSchema),
 });
-export type Achievement = z.infer<typeof AchievementSchema>;
+export type AchievementGroup = z.infer<typeof AchievementGroupSchema>;
 
-export const CreateAchievementSchema = AchievementSchema.omit({
+export const CreateAchievementGroupSchema = AchievementGroupSchema.omit({
   id: true,
   createdAt: true,
 });
-export type CreateAchievement = z.infer<typeof CreateAchievementSchema>;
+export type CreateAchievementGroup = z.infer<typeof CreateAchievementGroupSchema>;
 
-export const UpdateAchievementSchema = CreateAchievementSchema.partial();
-export type UpdateAchievement = z.infer<typeof UpdateAchievementSchema>;
+export const UpdateAchievementGroupSchema = CreateAchievementGroupSchema.partial();
+export type UpdateAchievementGroup = z.infer<typeof UpdateAchievementGroupSchema>;
