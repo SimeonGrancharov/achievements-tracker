@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import { initializeApp, cert, getApps, App } from 'firebase-admin/app';
 import { getAuth, Auth } from 'firebase-admin/auth';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
@@ -5,16 +6,15 @@ import { getFirestore, Firestore } from 'firebase-admin/firestore';
 let app: App;
 
 if (getApps().length === 0) {
-  // Use GOOGLE_APPLICATION_CREDENTIALS env var for service account
-  // or Application Default Credentials (ADC) in Google Cloud environments
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    // Allow passing service account JSON directly via env var
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    app = initializeApp({
-      credential: cert(serviceAccount),
-    });
+    app = initializeApp({ credential: cert(serviceAccount) });
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    const serviceAccount = JSON.parse(
+      readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf-8'),
+    );
+    app = initializeApp({ credential: cert(serviceAccount) });
   } else {
-    // Uses GOOGLE_APPLICATION_CREDENTIALS or ADC
     app = initializeApp();
   }
 } else {

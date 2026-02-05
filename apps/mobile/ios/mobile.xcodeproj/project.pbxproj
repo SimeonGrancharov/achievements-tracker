@@ -14,7 +14,7 @@
 		C2B9D119ED85E70576C28546 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE35CC13395EBA5637359152 /* ExpoModulesProvider.swift */; };
 		DBEDFE6474DF1398EEAE0204 /* libPods-mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B56DDC8BC2DA5744C92D4431 /* libPods-mobile.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		F18B767A2F33F95C00259EDB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F18B76792F33F95C00259EDB /* GoogleService-Info.plist */; };
+		F129F0752F35CC5D004F6F05 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F129F0742F35CC5D004F6F05 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,7 +31,7 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = mobile/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* mobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "mobile-Bridging-Header.h"; path = "mobile/mobile-Bridging-Header.h"; sourceTree = "<group>"; };
-		F18B76792F33F95C00259EDB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F129F0742F35CC5D004F6F05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,7 +49,7 @@
 		13B07FAE1A68108700A75B9A /* mobile */ = {
 			isa = PBXGroup;
 			children = (
-				F18B76792F33F95C00259EDB /* GoogleService-Info.plist */,
+				F129F0742F35CC5D004F6F05 /* GoogleService-Info.plist */,
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
 				F11748442D0722820044C1D9 /* mobile-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
@@ -198,7 +198,7 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F18B767A2F33F95C00259EDB /* GoogleService-Info.plist in Resources */,
+				F129F0752F35CC5D004F6F05 /* GoogleService-Info.plist in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				0AEA157A26B45FD536622233 /* PrivacyInfo.xcprivacy in Resources */,
 			);
