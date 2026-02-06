@@ -1,14 +1,21 @@
+import { useMemo } from "react";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  type Theme,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAppSelector } from "../store/hooks";
 import { useAuthStateListener } from "../hooks/useAuth";
+import { useTheme } from "../theme/useTheme";
 import { LoginScreen } from "../screens/LoginScreen";
 import { HomeScreen } from "../screens/HomeScreen";
 import { CreateAchievementGroupScreen } from "../screens/CreateAchievementScreen";
 import { ViewAchievementGroupScreen } from "../screens/ViewAchievementGroupScreen";
 import { EditAchievementGroupScreen } from "../screens/EditAchievementGroupScreen";
+import { SettingsScreen } from "../screens/SettingsScreen";
 import type { RootStackParamList } from "../navigation/types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -19,10 +26,27 @@ export function AuthGate() {
   const { user, isLoading, isInitialized } = useAppSelector(
     (state) => state.auth,
   );
+  const { colors, isDark } = useTheme();
+
+  const navTheme: Theme = useMemo(
+    () => ({
+      ...DefaultTheme,
+      dark: isDark,
+      colors: {
+        ...DefaultTheme.colors,
+        background: colors.background,
+        card: colors.background,
+        text: colors.text,
+        primary: colors.primary,
+        border: colors.border,
+      },
+    }),
+    [colors, isDark],
+  );
 
   if (!isInitialized || isLoading) {
     return (
-      <View style={styles.loading}>
+      <View style={[styles.loading, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -34,33 +58,32 @@ export function AuthGate() {
 
   return (
     <GestureHandlerRootView style={styles.flex}>
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
+    <NavigationContainer theme={navTheme}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen
           name="CreateAchievementGroup"
           component={CreateAchievementGroupScreen}
-          options={{
-            title: "New Achievement Group",
-            presentation: "modal",
-          }}
+          options={{ presentation: "modal" }}
         />
         <Stack.Screen
           name="ViewAchievementGroup"
           component={ViewAchievementGroupScreen}
-          options={{ title: "Achievement Group" }}
         />
         <Stack.Screen
           name="EditAchievementGroup"
           component={EditAchievementGroupScreen}
-          options={{
-            title: "Edit Achievement Group",
-            presentation: "modal",
-          }}
+          options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ presentation: "modal" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

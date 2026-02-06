@@ -20,6 +20,8 @@ import {
 import { Swipeable } from '../components/Swipeable';
 import { AchievementForm } from '../components/AchievementForm';
 import { Screen } from '../components/Screen';
+import { Header } from '../components/Header';
+import { useTheme } from '../theme/useTheme';
 import type { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditAchievementGroup'>;
@@ -28,6 +30,7 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
   const { id } = route.params;
   const { data: group, isLoading: isFetching } = useGetAchievementGroupQuery(id);
   const [updateGroup, { isLoading: isUpdating }] = useUpdateAchievementGroupMutation();
+  const { colors } = useTheme();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -76,6 +79,11 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
   if (isFetching) {
     return (
       <Screen>
+        <Header
+          title="Edit Achievement Group"
+          onBack={() => navigation.goBack()}
+          variant="close"
+        />
         <View style={styles.centered}>
           <ActivityIndicator size="large" />
         </View>
@@ -85,6 +93,11 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
 
   return (
     <Screen>
+      <Header
+        title="Edit Achievement Group"
+        onBack={() => navigation.goBack()}
+        variant="close"
+      />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -99,6 +112,7 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
           }}
           placeholder="Group name"
           error={nameError}
+          colors={colors}
         />
 
         <TextInput
@@ -110,13 +124,14 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
           multiline
           numberOfLines={4}
           textAlignVertical="top"
+          colors={colors}
         />
 
         <View style={styles.itemsHeader}>
-          <Text style={styles.sectionTitle}>Achievements ({items.length})</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Achievements ({items.length})</Text>
           {!showItemForm && (
             <TouchableOpacity onPress={() => setShowItemForm(true)}>
-              <Text style={styles.addLink}>+ Add</Text>
+              <Text style={[styles.addLink, { color: colors.primary }]}>+ Add</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -128,13 +143,13 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
             role="delete"
             onDelete={() => handleRemoveItem(index)}
           >
-            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
             {item.description ? (
-              <Text style={styles.itemDescription}>{item.description}</Text>
+              <Text style={[styles.itemDescription, { color: colors.textSecondary }]}>{item.description}</Text>
             ) : null}
             <View style={styles.itemTags}>
-              <Text style={styles.tag}>{item.size}</Text>
-              <Text style={styles.tag}>{item.type}</Text>
+              <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.size}</Text>
+              <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.type}</Text>
             </View>
           </Swipeable>
         ))}
@@ -142,7 +157,7 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
         {showItemForm && <AchievementForm onSubmit={handleAddItem} />}
 
         <TouchableOpacity
-          style={[styles.button, isUpdating && styles.buttonDisabled]}
+          style={[styles.button, { backgroundColor: colors.primary }, isUpdating && styles.buttonDisabled]}
           onPress={handleUpdate}
           disabled={isUpdating}
         >
@@ -175,7 +190,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
   },
   itemsHeader: {
     flexDirection: 'row',
@@ -185,7 +199,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   addLink: {
-    color: '#007AFF',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -195,7 +208,6 @@ const styles = StyleSheet.create({
   },
   itemDescription: {
     fontSize: 13,
-    color: '#666',
     marginTop: 4,
   },
   itemTags: {
@@ -204,16 +216,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   tag: {
-    backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
     fontSize: 12,
-    color: '#555',
     overflow: 'hidden',
   },
   button: {
-    backgroundColor: '#007AFF',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',

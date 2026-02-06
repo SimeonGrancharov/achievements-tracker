@@ -7,24 +7,44 @@ import {
   type TextInputProps as RNTextInputProps,
 } from 'react-native';
 
+type ThemeColors = {
+  background: string;
+  text: string;
+  textSecondary: string;
+  border: string;
+  primary: string;
+};
+
 interface TextInputProps extends RNTextInputProps {
   label?: string;
   error?: string;
+  colors?: ThemeColors;
 }
 
-export function TextInput({ label, error, style, ...props }: TextInputProps) {
+const defaultColors: ThemeColors = {
+  background: '#fff',
+  text: '#333',
+  textSecondary: '#999',
+  border: '#ddd',
+  primary: '#007AFF',
+};
+
+export function TextInput({ label, error, style, colors: c, ...props }: TextInputProps) {
   const [focused, setFocused] = useState(false);
+  const colors = c ?? defaultColors;
 
   return (
     <View>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
       <RNTextInput
         style={[
           styles.input,
-          focused && styles.inputFocused,
+          { backgroundColor: colors.background, borderColor: colors.border, color: colors.text },
+          focused && { borderColor: colors.primary },
           error && styles.inputError,
           style,
         ]}
+        placeholderTextColor={colors.textSecondary}
         onFocus={(e) => {
           setFocused(true);
           props.onFocus?.(e);
@@ -44,20 +64,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 6,
     marginTop: 16,
   },
   input: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  inputFocused: {
-    borderColor: '#007AFF',
   },
   inputError: {
     borderColor: '#ff3b30',

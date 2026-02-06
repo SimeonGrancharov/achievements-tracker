@@ -3,4 +3,5 @@ export type RootStackParamList = {
   CreateAchievementGroup: undefined;
   ViewAchievementGroup: { id: string };
   EditAchievementGroup: { id: string };
+  Settings: undefined;
 };

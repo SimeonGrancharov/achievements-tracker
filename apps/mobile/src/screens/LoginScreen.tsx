@@ -11,11 +11,13 @@ import {
 } from 'react-native';
 import { signIn } from '../hooks/useAuth';
 import { Screen } from '../components/Screen';
+import { useTheme } from '../theme/useTheme';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -40,11 +42,12 @@ export function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.form}>
-        <Text style={styles.title}>Achievements Tracker</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Achievements Tracker</Text>
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: colors.border, backgroundColor: colors.background, color: colors.text }]}
           placeholder="Email"
+          placeholderTextColor={colors.textSecondary}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -53,8 +56,9 @@ export function LoginScreen() {
         />
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: colors.border, backgroundColor: colors.background, color: colors.text }]}
           placeholder="Password"
+          placeholderTextColor={colors.textSecondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -62,7 +66,7 @@ export function LoginScreen() {
         />
 
         <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+          style={[styles.button, { backgroundColor: colors.primary }, loading && styles.buttonDisabled]}
           onPress={handleLogin}
           disabled={loading}
         >
@@ -93,14 +97,12 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',

@@ -1,4 +1,3 @@
-import { useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +9,8 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useGetAchievementGroupQuery } from '../store/api';
 import { Screen } from '../components/Screen';
+import { Header } from '../components/Header';
+import { useTheme } from '../theme/useTheme';
 import type { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ViewAchievementGroup'>;
@@ -17,20 +18,18 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ViewAchievementGroup'>;
 export function ViewAchievementGroupScreen({ route, navigation }: Props) {
   const { id } = route.params;
   const { data: group, isLoading, error } = useGetAchievementGroupQuery(id);
+  const { colors } = useTheme();
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('EditAchievementGroup', { id })}>
-          <Text style={styles.editButton}>Edit</Text>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation, id]);
+  const editButton = (
+    <TouchableOpacity onPress={() => navigation.navigate('EditAchievementGroup', { id })}>
+      <Text style={[styles.editButton, { color: colors.primary }]}>Edit</Text>
+    </TouchableOpacity>
+  );
 
   if (isLoading) {
     return (
       <Screen>
+        <Header title="Achievement Group" onBack={() => navigation.goBack()} />
         <View style={styles.centered}>
           <ActivityIndicator size="large" />
         </View>
@@ -41,6 +40,7 @@ export function ViewAchievementGroupScreen({ route, navigation }: Props) {
   if (error || !group) {
     return (
       <Screen>
+        <Header title="Achievement Group" onBack={() => navigation.goBack()} />
         <View style={styles.centered}>
           <Text style={styles.error}>Failed to load achievement group</Text>
         </View>
@@ -50,31 +50,36 @@ export function ViewAchievementGroupScreen({ route, navigation }: Props) {
 
   return (
     <Screen>
+      <Header
+        title="Achievement Group"
+        onBack={() => navigation.goBack()}
+        right={editButton}
+      />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.name}>{group.name}</Text>
+      <Text style={[styles.name, { color: colors.text }]}>{group.name}</Text>
       {group.description ? (
-        <Text style={styles.description}>{group.description}</Text>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>{group.description}</Text>
       ) : null}
-      <Text style={styles.date}>
+      <Text style={[styles.date, { color: colors.textSecondary }]}>
         Created {new Date(group.createdAt).toLocaleDateString()}
       </Text>
 
-      <Text style={styles.sectionTitle}>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
         Achievements ({group.achievements.length})
       </Text>
 
       {group.achievements.length === 0 ? (
-        <Text style={styles.emptyText}>No achievements yet</Text>
+        <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No achievements yet</Text>
       ) : (
         group.achievements.map((item, index) => (
-          <View key={index} style={styles.itemCard}>
-            <Text style={styles.itemName}>{item.name}</Text>
+          <View key={index} style={[styles.itemCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+            <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
             {item.description ? (
-              <Text style={styles.itemDescription}>{item.description}</Text>
+              <Text style={[styles.itemDescription, { color: colors.textSecondary }]}>{item.description}</Text>
             ) : null}
             <View style={styles.itemTags}>
-              <Text style={styles.tag}>{item.size}</Text>
-              <Text style={styles.tag}>{item.type}</Text>
+              <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.size}</Text>
+              <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.type}</Text>
             </View>
           </View>
         ))
@@ -98,34 +103,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    color: '#007AFF',
     fontSize: 16,
     fontWeight: '600',
   },
   name: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#333',
     marginBottom: 8,
   },
   description: {
     fontSize: 16,
-    color: '#666',
     marginBottom: 12,
   },
   date: {
     fontSize: 13,
-    color: '#999',
     marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 12,
   },
   emptyText: {
-    color: '#999',
     textAlign: 'center',
     marginTop: 16,
   },
@@ -134,12 +133,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   itemCard: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#eee',
   },
   itemName: {
     fontSize: 15,
@@ -147,7 +144,6 @@ const styles = StyleSheet.create({
   },
   itemDescription: {
     fontSize: 13,
-    color: '#666',
     marginTop: 4,
   },
   itemTags: {
@@ -156,12 +152,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   tag: {
-    backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
     fontSize: 12,
-    color: '#555',
     overflow: 'hidden',
   },
 });

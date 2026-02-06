@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { Swipeable as RNSwipeable } from 'react-native-gesture-handler';
+import { useTheme } from '../theme/useTheme';
 
 type Props = {
   children: ReactNode;
@@ -13,6 +14,7 @@ type Props = {
 
 export function Swipeable({ children, view, onPress, onDelete, isDeleting = false }: Props) {
   const swipeableRef = useRef<RNSwipeable>(null);
+  const { colors } = useTheme();
 
   const renderRightActions = () => (
     <TouchableOpacity
@@ -28,9 +30,12 @@ export function Swipeable({ children, view, onPress, onDelete, isDeleting = fals
     </TouchableOpacity>
   );
 
+  const cardStyle = { backgroundColor: colors.background, borderColor: colors.border };
+  const tileStyle = { backgroundColor: colors.background, borderBottomColor: colors.border };
+
   const content = onPress ? (
     <TouchableOpacity
-      style={view === 'card' ? styles.card : styles.tile}
+      style={[view === 'card' ? styles.card : styles.tile, view === 'card' ? cardStyle : tileStyle]}
       onPress={onPress}
       activeOpacity={0.7}
       delayPressIn={100}
@@ -38,7 +43,7 @@ export function Swipeable({ children, view, onPress, onDelete, isDeleting = fals
       {children}
     </TouchableOpacity>
   ) : (
-    <View style={view === 'card' ? styles.card : styles.tile}>
+    <View style={[view === 'card' ? styles.card : styles.tile, view === 'card' ? cardStyle : tileStyle]}>
       {children}
     </View>
   );
@@ -57,19 +62,15 @@ export function Swipeable({ children, view, onPress, onDelete, isDeleting = fals
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#e5e5e5',
   },
   tile: {
-    backgroundColor: '#fff',
     padding: 12,
     marginBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ddd',
   },
   deleteAction: {
     backgroundColor: '#ff3b30',
