@@ -1,0 +1,9 @@
+node_modules
+.git
+.gitignore
+apps/mobile
+**/dist
+**/.env
+**/.dev.env
+**/secrets
+*.md
