@@ -14,6 +14,9 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@achievements-tracker/components':
+        specifier: workspace:*
+        version: link:../../packages/components
       '@achievements-tracker/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -106,6 +109,22 @@ importers:
       vitest:
         specifier: ^4.0.18
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@22.13.1)(lightningcss@1.31.1)(terser@5.46.0)(tsx@4.19.2)(yaml@2.8.2)
+
+  packages/components:
+    dependencies:
+      react:
+        specifier: '*'
+        version: 19.1.0
+      react-native:
+        specifier: '*'
+        version: 0.81.5(@babel/core@7.29.0)(@react-native-community/cli@20.1.1(typescript@5.7.3))(@types/react@19.1.0)(react@19.1.0)
+    devDependencies:
+      '@types/react':
+        specifier: 19.1.0
+        version: 19.1.0
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/shared:
     dependencies:

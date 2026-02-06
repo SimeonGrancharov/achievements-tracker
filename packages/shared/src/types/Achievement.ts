@@ -3,7 +3,7 @@ import { AchievementSize } from './AchievementSize';
 import { AchievementType } from './AchievementType';
 
 export const AchievementSchema = z.object({
-  name: z.string(),
+  name: z.string().trim().min(1, 'Achievement name is required'),
   description: z.string(),
   size: AchievementSize,
   type: AchievementType,
@@ -12,7 +12,7 @@ export type Achievement = z.infer<typeof AchievementSchema>;
 
 export const AchievementGroupSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().trim().min(1, 'Group name is required'),
   createdAt: z.number(),
   description: z.string(),
   achievements: z.array(AchievementSchema),

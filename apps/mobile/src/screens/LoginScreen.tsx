@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { signIn } from '../hooks/useAuth';
+import { Screen } from '../components/Screen';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -33,11 +34,12 @@ export function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={styles.form}>
+    <Screen>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.form}>
         <Text style={styles.title}>Achievements Tracker</Text>
 
         <TextInput
@@ -68,15 +70,15 @@ export function LoginScreen() {
             {loading ? 'Signing in...' : 'Sign In'}
           </Text>
         </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   form: {
     flex: 1,

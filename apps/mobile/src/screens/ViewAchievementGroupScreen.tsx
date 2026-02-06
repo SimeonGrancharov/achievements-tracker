@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useGetAchievementGroupQuery } from '../store/api';
+import { Screen } from '../components/Screen';
 import type { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ViewAchievementGroup'>;
@@ -29,22 +30,27 @@ export function ViewAchievementGroupScreen({ route, navigation }: Props) {
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </View>
+      <Screen>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" />
+        </View>
+      </Screen>
     );
   }
 
   if (error || !group) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.error}>Failed to load achievement group</Text>
-      </View>
+      <Screen>
+        <View style={styles.centered}>
+          <Text style={styles.error}>Failed to load achievement group</Text>
+        </View>
+      </Screen>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <Screen>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.name}>{group.name}</Text>
       {group.description ? (
         <Text style={styles.description}>{group.description}</Text>
@@ -73,14 +79,14 @@ export function ViewAchievementGroupScreen({ route, navigation }: Props) {
           </View>
         ))
       )}
-    </ScrollView>
+      </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   content: {
     padding: 16,

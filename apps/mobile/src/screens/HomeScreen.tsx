@@ -6,6 +6,7 @@ import { useAppSelector } from '../store/hooks';
 import { useGetAchievementGroupsQuery, useDeleteAchievementGroupMutation } from '../store/api';
 import { signOut } from '../hooks/useAuth';
 import { Swipeable } from '../components/Swipeable';
+import { Screen } from '../components/Screen';
 import type { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -37,7 +38,8 @@ export function HomeScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <Screen>
+      <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome, {user?.email}</Text>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
@@ -74,21 +76,21 @@ export function HomeScreen({ navigation }: Props) {
         }
       />
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('CreateAchievementGroup')}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigation.navigate('CreateAchievementGroup')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     paddingTop: 60,
   },
   header: {

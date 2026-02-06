@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
@@ -10,97 +9,29 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+import { TextInput } from '@achievements-tracker/components';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { Achievement } from '@achievements-tracker/shared';
 import { useCreateAchievementGroupMutation } from '../store/api';
 import { Swipeable } from '../components/Swipeable';
+import { AchievementForm } from '../components/AchievementForm';
+import { Screen } from '../components/Screen';
 import type { RootStackParamList } from '../navigation/types';
 
-const SIZES = ['S', 'M', 'L'] as const;
-const TYPES = ['Feature', 'DevEx', 'Bug', 'Self-improvement'] as const;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CreateAchievementGroup'>;
-
-function ItemForm({ onAdd }: { onAdd: (item: Achievement) => void }) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [size, setSize] = useState<Achievement['size']>('M');
-  const [type, setType] = useState<Achievement['type']>('Feature');
-
-  const handleAdd = () => {
-    if (!name.trim()) {
-      Alert.alert('Validation', 'Item name is required');
-      return;
-    }
-    onAdd({ name: name.trim(), description: description.trim(), size, type });
-    setName('');
-    setDescription('');
-    setSize('M');
-    setType('Feature');
-  };
-
-  return (
-    <View style={styles.itemForm}>
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Achievement name"
-      />
-      <TextInput
-        style={[styles.input, { marginTop: 8 }]}
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Achievement description"
-      />
-
-      <Text style={styles.label}>Size</Text>
-      <View style={styles.chips}>
-        {SIZES.map((s) => (
-          <TouchableOpacity
-            key={s}
-            style={[styles.chip, size === s && styles.chipSelected]}
-            onPress={() => setSize(s)}
-          >
-            <Text style={[styles.chipText, size === s && styles.chipTextSelected]}>
-              {s}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <Text style={styles.label}>Type</Text>
-      <View style={styles.chips}>
-        {TYPES.map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.chip, type === t && styles.chipSelected]}
-            onPress={() => setType(t)}
-          >
-            <Text style={[styles.chipText, type === t && styles.chipTextSelected]}>
-              {t}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <TouchableOpacity style={styles.addItemButton} onPress={handleAdd}>
-        <Text style={styles.addItemButtonText}>Add Achievement</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
 
 export function CreateAchievementGroupScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [items, setItems] = useState<Achievement[]>([]);
   const [showItemForm, setShowItemForm] = useState(false);
+  const [nameError, setNameError] = useState('');
   const [createGroup, { isLoading }] = useCreateAchievementGroupMutation();
 
   const handleCreate = async () => {
     if (!name.trim()) {
-      Alert.alert('Validation', 'Name is required');
+      setNameError('Name is required');
       return;
     }
 
@@ -126,23 +57,27 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.form}>
-        <Text style={styles.label}>Name</Text>
+    <Screen>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.form}>
         <TextInput
-          style={styles.input}
+          label="Name"
           value={name}
-          onChangeText={setName}
+          onChangeText={(text) => {
+            setName(text);
+            if (nameError) setNameError('');
+          }}
           placeholder="Group name"
           autoFocus
+          error={nameError}
         />
 
-        <Text style={styles.label}>Description</Text>
         <TextInput
-          style={[styles.input, styles.textArea]}
+          label="Description"
+          style={styles.textArea}
           value={description}
           onChangeText={setDescription}
           placeholder="Description"
@@ -179,7 +114,7 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
         ))}
 
         {showItemForm && (
-          <ItemForm onAdd={handleAddItem} />
+          <AchievementForm onSubmit={handleAddItem} />
         )}
 
         <TouchableOpacity
@@ -190,35 +125,20 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
           <Text style={styles.buttonText}>
             {isLoading ? 'Creating...' : 'Create'}
           </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   form: {
     padding: 16,
     paddingBottom: 40,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
   },
   textArea: {
     minHeight: 100,
@@ -262,50 +182,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
     overflow: 'hidden',
-  },
-  itemForm: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#007AFF',
-    marginBottom: 8,
-  },
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  chipSelected: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
-  },
-  chipText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  chipTextSelected: {
-    color: '#fff',
-  },
-  addItemButton: {
-    marginTop: 12,
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-  },
-  addItemButtonText: {
-    color: '#007AFF',
-    fontWeight: '600',
-    fontSize: 14,
   },
   button: {
     backgroundColor: '#007AFF',
