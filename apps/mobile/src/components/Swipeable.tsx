@@ -80,8 +80,10 @@ const styles = StyleSheet.create({
   },
   deleteCard: {
     marginBottom: 12,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
+    marginLeft: -12,
+    paddingLeft: 12,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
   deleteTile: {
     marginBottom: 8,

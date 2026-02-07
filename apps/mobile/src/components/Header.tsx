@@ -8,14 +8,15 @@ type HeaderProps = {
   onBack?: () => void;
   variant?: 'back' | 'close';
   right?: ReactNode;
+  modal?: boolean;
 };
 
-export function Header({ title, onBack, variant = 'back', right }: HeaderProps) {
+export function Header({ title, onBack, variant = 'back', right, modal }: HeaderProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
+    <View style={[styles.container, { paddingTop: modal ? 16 : insets.top, backgroundColor: colors.background }]}>
       <View style={styles.row}>
         <View style={styles.side}>
           {onBack && (

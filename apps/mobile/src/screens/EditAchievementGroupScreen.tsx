@@ -4,11 +4,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { TextInput } from '@achievements-tracker/components';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +15,7 @@ import {
   useUpdateAchievementGroupMutation,
 } from '../store/api';
 import { Swipeable } from '../components/Swipeable';
+import { Skeleton } from '../components/Skeleton';
 import { AchievementForm } from '../components/AchievementForm';
 import { Screen } from '../components/Screen';
 import { Header } from '../components/Header';
@@ -36,13 +34,16 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
   const [description, setDescription] = useState('');
   const [items, setItems] = useState<Achievement[]>([]);
   const [showItemForm, setShowItemForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [nameError, setNameError] = useState('');
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (group) {
       setName(group.name);
       setDescription(group.description);
       setItems(group.achievements);
+      setIsReady(true);
     }
   }, [group]);
 
@@ -68,7 +69,12 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
   };
 
   const handleAddItem = (item: Achievement) => {
-    setItems((prev) => [...prev, item]);
+    if (editingIndex !== null) {
+      setItems((prev) => prev.map((it, i) => (i === editingIndex ? item : it)));
+      setEditingIndex(null);
+    } else {
+      setItems((prev) => [...prev, item]);
+    }
     setShowItemForm(false);
   };
 
@@ -76,16 +82,31 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  if (isFetching) {
+  if (isFetching || !isReady) {
     return (
       <Screen>
         <Header
           title="Edit Achievement Group"
           onBack={() => navigation.goBack()}
           variant="close"
+          modal
         />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" />
+        <View style={styles.skeletonForm}>
+          <Skeleton width={40} height={14} />
+          <Skeleton width="100%" height={44} borderRadius={8} style={{ marginTop: 6 }} />
+          <Skeleton width={80} height={14} style={{ marginTop: 16 }} />
+          <Skeleton width="100%" height={100} borderRadius={8} style={{ marginTop: 6 }} />
+          <Skeleton width={120} height={16} style={{ marginTop: 24 }} />
+          {[0, 1].map((i) => (
+            <View key={i} style={styles.skeletonTile}>
+              <Skeleton width="50%" height={15} />
+              <Skeleton width="70%" height={13} style={{ marginTop: 6 }} />
+              <View style={styles.skeletonTags}>
+                <Skeleton width={32} height={20} borderRadius={4} />
+                <Skeleton width={56} height={20} borderRadius={4} />
+              </View>
+            </View>
+          ))}
         </View>
       </Screen>
     );
@@ -97,12 +118,9 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
         title="Edit Achievement Group"
         onBack={() => navigation.goBack()}
         variant="close"
+        modal
       />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView contentContainerStyle={styles.form}>
+        <ScrollView contentContainerStyle={styles.form} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled">
         <TextInput
           label="Name"
           value={name}
@@ -130,31 +148,47 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
         <View style={styles.itemsHeader}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Achievements ({items.length})</Text>
           {!showItemForm && (
-            <TouchableOpacity onPress={() => setShowItemForm(true)}>
+            <TouchableOpacity onPress={() => setShowItemForm(true)} hitSlop={8}>
               <Text style={[styles.addLink, { color: colors.primary }]}>+ Add</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {items.map((item, index) => (
-          <Swipeable
-            key={index}
-            view="tile"
-            role="delete"
-            onDelete={() => handleRemoveItem(index)}
-          >
-            <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
-            {item.description ? (
-              <Text style={[styles.itemDescription, { color: colors.textSecondary }]}>{item.description}</Text>
-            ) : null}
-            <View style={styles.itemTags}>
-              <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.size}</Text>
-              <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.type}</Text>
-            </View>
-          </Swipeable>
+          editingIndex === index ? (
+            <AchievementForm
+              key={index}
+              initialData={item}
+              onSubmit={handleAddItem}
+              onCancel={() => {
+                setEditingIndex(null);
+                setShowItemForm(false);
+              }}
+            />
+          ) : (
+            <Swipeable
+              key={index}
+              view="tile"
+              role="delete"
+              onPress={() => {
+                setEditingIndex(index);
+                setShowItemForm(false);
+              }}
+              onDelete={() => handleRemoveItem(index)}
+            >
+              <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
+              {item.description ? (
+                <Text style={[styles.itemDescription, { color: colors.textSecondary }]}>{item.description}</Text>
+              ) : null}
+              <View style={styles.itemTags}>
+                <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.size}</Text>
+                <Text style={[styles.tag, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.type}</Text>
+              </View>
+            </Swipeable>
+          )
         ))}
 
-        {showItemForm && <AchievementForm onSubmit={handleAddItem} />}
+        {showItemForm && editingIndex === null && <AchievementForm onSubmit={handleAddItem} />}
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }, isUpdating && styles.buttonDisabled]}
@@ -166,19 +200,21 @@ export function EditAchievementGroupScreen({ route, navigation }: Props) {
           </Text>
         </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  skeletonForm: {
+    padding: 16,
   },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  skeletonTile: {
+    paddingVertical: 12,
+  },
+  skeletonTags: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 8,
   },
   form: {
     padding: 16,

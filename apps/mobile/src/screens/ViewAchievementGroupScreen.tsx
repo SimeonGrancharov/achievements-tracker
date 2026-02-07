@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useGetAchievementGroupQuery } from '../store/api';
 import { Screen } from '../components/Screen';
@@ -21,8 +22,8 @@ export function ViewAchievementGroupScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
 
   const editButton = (
-    <TouchableOpacity onPress={() => navigation.navigate('EditAchievementGroup', { id })}>
-      <Text style={[styles.editButton, { color: colors.primary }]}>Edit</Text>
+    <TouchableOpacity onPress={() => navigation.navigate('EditAchievementGroup', { id })} hitSlop={8}>
+      <Feather name="edit-2" size={20} color={colors.primary} />
     </TouchableOpacity>
   );
 
@@ -101,10 +102,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  editButton: {
-    fontSize: 16,
-    fontWeight: '600',
   },
   name: {
     fontSize: 24,

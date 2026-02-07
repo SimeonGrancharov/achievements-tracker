@@ -1,46 +1,71 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TextInput } from '@achievements-tracker/components';
-import type { Achievement } from '@achievements-tracker/shared';
-import { SIZES, TYPES } from '../constants/achievement';
-import { useTheme } from '../theme/useTheme';
+import { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  InputAccessoryView,
+} from "react-native";
+import { TextInput } from "@achievements-tracker/components";
+import type { Achievement } from "@achievements-tracker/shared";
+import {
+  AchievementItemTypes,
+  AchievmentItemSizes,
+} from "../constants/achievement";
+import { useTheme } from "../theme/useTheme";
 
 interface AchievementFormProps {
   onSubmit: (achievement: Achievement) => void;
+  onCancel?: () => void;
+  initialData?: Achievement;
 }
 
-export function AchievementForm({ onSubmit }: AchievementFormProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [size, setSize] = useState<Achievement['size']>('M');
-  const [type, setType] = useState<Achievement['type']>('Feature');
-  const [nameError, setNameError] = useState('');
+export function AchievementForm({ onSubmit, onCancel, initialData }: AchievementFormProps) {
+  const isEditing = !!initialData;
+  const [name, setName] = useState(initialData?.name ?? "");
+  const [description, setDescription] = useState(initialData?.description ?? "");
+  const [size, setSize] = useState<Achievement["size"]>(initialData?.size ?? "M");
+  const [type, setType] = useState<Achievement["type"]>(initialData?.type ?? "Feature");
+  const [nameError, setNameError] = useState("");
   const { colors } = useTheme();
+
+  const accessoryID = "achievement-form-keyboard";
 
   const handleAdd = () => {
     if (!name.trim()) {
-      setNameError('Item name is required');
+      setNameError("Item name is required");
       return;
     }
-    onSubmit({ name: name.trim(), description: description.trim(), size, type });
-    setName('');
-    setDescription('');
-    setSize('M');
-    setType('Feature');
-    setNameError('');
+    onSubmit({
+      name: name.trim(),
+      description: description.trim(),
+      size,
+      type,
+    });
+    setName("");
+    setDescription("");
+    setSize("M");
+    setType("Feature");
+    setNameError("");
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, borderColor: colors.primary }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background, borderColor: colors.primary },
+      ]}
+    >
       <TextInput
         value={name}
         onChangeText={(text) => {
           setName(text);
-          if (nameError) setNameError('');
+          if (nameError) setNameError("");
         }}
         placeholder="Achievement name"
         error={nameError}
         colors={colors}
+        inputAccessoryViewID={accessoryID}
       />
       <TextInput
         style={{ marginTop: 8 }}
@@ -48,21 +73,31 @@ export function AchievementForm({ onSubmit }: AchievementFormProps) {
         onChangeText={setDescription}
         placeholder="Achievement description"
         colors={colors}
+        inputAccessoryViewID={accessoryID}
       />
 
       <Text style={[styles.label, { color: colors.text }]}>Size</Text>
       <View style={styles.chips}>
-        {SIZES.map((s) => (
+        {AchievmentItemSizes.map((s) => (
           <TouchableOpacity
             key={s}
             style={[
               styles.chip,
-              { backgroundColor: colors.border, borderColor: colors.border },
-              size === s && { backgroundColor: colors.primary, borderColor: colors.primary },
+              { backgroundColor: colors.background, borderColor: colors.border },
+              size === s && {
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              },
             ]}
             onPress={() => setSize(s)}
           >
-            <Text style={[styles.chipText, { color: colors.text }, size === s && styles.chipTextSelected]}>
+            <Text
+              style={[
+                styles.chipText,
+                { color: colors.textSecondary },
+                size === s && styles.chipTextSelected,
+              ]}
+            >
               {s}
             </Text>
           </TouchableOpacity>
@@ -71,26 +106,66 @@ export function AchievementForm({ onSubmit }: AchievementFormProps) {
 
       <Text style={[styles.label, { color: colors.text }]}>Type</Text>
       <View style={styles.chips}>
-        {TYPES.map((t) => (
+        {AchievementItemTypes.map((t) => (
           <TouchableOpacity
             key={t}
             style={[
               styles.chip,
-              { backgroundColor: colors.border, borderColor: colors.border },
-              type === t && { backgroundColor: colors.primary, borderColor: colors.primary },
+              { backgroundColor: colors.background, borderColor: colors.border },
+              type === t && {
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              },
             ]}
             onPress={() => setType(t)}
           >
-            <Text style={[styles.chipText, { color: colors.text }, type === t && styles.chipTextSelected]}>
+            <Text
+              style={[
+                styles.chipText,
+                { color: colors.textSecondary },
+                type === t && styles.chipTextSelected,
+              ]}
+            >
               {t}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.border }]} onPress={handleAdd}>
-        <Text style={[styles.addButtonText, { color: colors.primary }]}>Add Achievement</Text>
-      </TouchableOpacity>
+      <View style={styles.formButtons}>
+        {isEditing && onCancel && (
+          <TouchableOpacity
+            style={[styles.addButton, styles.cancelButton, { backgroundColor: colors.border }]}
+            onPress={onCancel}
+          >
+            <Text style={[styles.addButtonText, { color: colors.text }]}>Cancel</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={[styles.addButton, isEditing && styles.flexButton, { backgroundColor: colors.border }]}
+          onPress={handleAdd}
+        >
+          <Text style={[styles.addButtonText, { color: colors.primary }]}>
+            {isEditing ? "Save" : "Add Achievement"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <InputAccessoryView nativeID={accessoryID}>
+        <View
+          style={[
+            styles.keyboardBar,
+            { backgroundColor: colors.background, borderTopColor: colors.border },
+          ]}
+        >
+          <TouchableOpacity
+            style={[styles.keyboardButton, { backgroundColor: colors.primary }]}
+            onPress={handleAdd}
+          >
+            <Text style={styles.keyboardButtonText}>{isEditing ? "Save Achievement" : "Add Achievement"}</Text>
+          </TouchableOpacity>
+        </View>
+      </InputAccessoryView>
     </View>
   );
 }
@@ -104,13 +179,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 6,
     marginTop: 16,
   },
   chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   chip: {
@@ -123,16 +198,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   chipTextSelected: {
-    color: '#fff',
+    color: "#fff",
+  },
+  formButtons: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
   },
   addButton: {
-    marginTop: 12,
-    alignItems: 'center',
+    alignItems: "center",
     padding: 10,
     borderRadius: 8,
   },
+  cancelButton: {
+    flex: 1,
+  },
+  flexButton: {
+    flex: 1,
+  },
   addButtonText: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 14,
+  },
+  keyboardBar: {
+    padding: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  keyboardButton: {
+    borderRadius: 8,
+    padding: 10,
+    alignItems: "center",
+  },
+  keyboardButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });

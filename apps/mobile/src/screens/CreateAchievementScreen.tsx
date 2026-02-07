@@ -4,8 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
   ScrollView,
 } from 'react-native';
@@ -64,12 +62,9 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
         title="New Achievement Group"
         onBack={() => navigation.goBack()}
         variant="close"
+        modal
       />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView contentContainerStyle={styles.form}>
+        <ScrollView contentContainerStyle={styles.form} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled">
         <TextInput
           label="Name"
           value={name}
@@ -98,7 +93,7 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
         <View style={styles.itemsHeader}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Achievements ({items.length})</Text>
           {!showItemForm && (
-            <TouchableOpacity onPress={() => setShowItemForm(true)}>
+            <TouchableOpacity onPress={() => setShowItemForm(true)} hitSlop={8}>
               <Text style={[styles.addLink, { color: colors.primary }]}>+ Add</Text>
             </TouchableOpacity>
           )}
@@ -136,15 +131,11 @@ export function CreateAchievementGroupScreen({ navigation }: Props) {
           </Text>
           </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   form: {
     padding: 16,
     paddingBottom: 40,
