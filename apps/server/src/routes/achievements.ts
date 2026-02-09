@@ -12,13 +12,13 @@ const router: RouterType = Router();
 
 router.use(authMiddleware);
 
-router.get('/', async (_req, res) => {
-  const achievements = await achievementsService.getAllAchievements();
+router.get('/', async (req, res) => {
+  const achievements = await achievementsService.getAllAchievements(req.user!.uid);
   res.json(achievements);
 });
 
 router.get('/:id', async (req, res) => {
-  const achievement = await achievementsService.getAchievementById(req.params.id);
+  const achievement = await achievementsService.getAchievementById(req.user!.uid, req.params.id);
   if (!achievement) {
     res.status(404).json({ error: 'Achievement not found' });
     return;
@@ -27,12 +27,12 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', validate(CreateAchievementGroupSchema), async (req, res) => {
-  const achievement = await achievementsService.createAchievement(req.body);
+  const achievement = await achievementsService.createAchievement(req.user!.uid, req.body);
   res.status(201).json(achievement);
 });
 
 router.patch('/:id', validate(UpdateAchievementGroupSchema), async (req: Request<{ id: string }>, res) => {
-  const achievement = await achievementsService.updateAchievement(req.params.id, req.body);
+  const achievement = await achievementsService.updateAchievement(req.user!.uid, req.params.id, req.body);
   if (!achievement) {
     res.status(404).json({ error: 'Achievement not found' });
     return;
@@ -41,7 +41,7 @@ router.patch('/:id', validate(UpdateAchievementGroupSchema), async (req: Request
 });
 
 router.delete('/:id', async (req, res) => {
-  const deleted = await achievementsService.deleteAchievement(req.params.id);
+  const deleted = await achievementsService.deleteAchievement(req.user!.uid, req.params.id);
   if (!deleted) {
     res.status(404).json({ error: 'Achievement not found' });
     return;
@@ -50,7 +50,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.post('/:id/items', validate(AchievementSchema), async (req: Request<{ id: string }>, res) => {
-  const achievement = await achievementsService.addAchievementItem(req.params.id, req.body);
+  const achievement = await achievementsService.addAchievementItem(req.user!.uid, req.params.id, req.body);
   if (!achievement) {
     res.status(404).json({ error: 'Achievement not found' });
     return;
