@@ -1,4 +1,4 @@
-package com.mobile
+package monkas.achievements
 
 import android.os.Build
 import android.os.Bundle

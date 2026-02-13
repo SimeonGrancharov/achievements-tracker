@@ -12,5 +12,8 @@ local.properties
 *.hprof
 .cxx/
 
+# Firebase
+app/google-services.json
+
 # Bundle artifacts
 *.jsbundle
